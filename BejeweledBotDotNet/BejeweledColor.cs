@@ -15,7 +15,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 7, 190, 26);
+                return Color.Green;
             }
         }
 
@@ -23,7 +23,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 12, 136, 254);
+                return Color.Blue;
             }
         } 
 
@@ -31,7 +31,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 240, 25, 51);
+                return Color.Red;
             }
         }
 
@@ -39,7 +39,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 254, 234, 33);
+                return Color.Yellow;
             }
         }
 
@@ -47,7 +47,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 240, 96, 20);
+                return Color.Orange;
             }
         }
 
@@ -55,7 +55,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 238, 238, 238);
+                return Color.White;
             }
         }
 
@@ -63,7 +63,7 @@ namespace DotNetBejewelledBot
         {
             get
             {
-                return Color.FromArgb(255, 233, 14, 233);
+                return Color.Purple;
             }
         }
     }
