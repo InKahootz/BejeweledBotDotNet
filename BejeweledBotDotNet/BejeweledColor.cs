@@ -66,5 +66,13 @@ namespace DotNetBejewelledBot
                 return Color.Purple;
             }
         }
+
+        public static Color Black
+        {
+            get
+            {
+                return Color.Black;
+            }
+        }
     }
 }

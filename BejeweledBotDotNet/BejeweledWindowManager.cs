@@ -4,12 +4,13 @@ using System.Threading;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using System.Collections.Generic;
 
 namespace DotNetBejewelledBot
 {
     class BejeweledWindowManager
     {
-        const int touchDelay = 1000;
+        const int touchDelay = 800;
         private Rectangle m_Window;
         private Bitmap m_ScreenShot;
         private LockBitmap m_lockScreenShot;
@@ -23,8 +24,6 @@ namespace DotNetBejewelledBot
         private long moves4 = 0;
         private long moves5 = 0;
         private long moves6 = 0;
-
-        private DxCapture dxCap;
 
         private enum ValidGemMoves
         {
@@ -55,29 +54,25 @@ namespace DotNetBejewelledBot
             m_Window = new Rectangle(new Point(0, 0), new Size(320, 320));
             m_ColorMatrix = new Color[8, 8];
 
-            dxCap = new DxCapture();
-            dxCap.Init();
-
-            //GetScreenshot();
-            //GetColourGrid();
+            GetScreenshot();
+            GetColourGrid();
         }
 
         public void GetScreenshot()
         {
             try
             {
-                //m_ScreenShot = new Bitmap(2560, 1440, PixelFormat.Format32bppArgb);
-                m_ScreenShot = dxCap.TakeScreenShot();
+                m_ScreenShot = new Bitmap(2560, 1440, PixelFormat.Format32bppArgb);
 
-                //using (Graphics gfxScreenshot = Graphics.FromImage(m_ScreenShot))
-                //{
-                //    gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
-                //                                 Screen.PrimaryScreen.Bounds.Y,
-                //                                 0,
-                //                                 0,
-                //                                 Screen.PrimaryScreen.Bounds.Size,
-                //                                 CopyPixelOperation.SourceCopy);
-                //}
+                using (Graphics gfxScreenshot = Graphics.FromImage(m_ScreenShot))
+                {
+                    gfxScreenshot.CopyFromScreen(Screen.PrimaryScreen.Bounds.X,
+                                                 Screen.PrimaryScreen.Bounds.Y,
+                                                 0,
+                                                 0,
+                                                 Screen.PrimaryScreen.Bounds.Size,
+                                                 CopyPixelOperation.SourceCopy);
+                }
                 m_lockScreenShot = new LockBitmap(m_ScreenShot);
             }
             catch
@@ -97,44 +92,120 @@ namespace DotNetBejewelledBot
                     if (BejeweledColor.Collection.Contains(m_ColorMatrix[x, y]))
                     {
                         Color currentColor = m_ColorMatrix[x, y];
-
+                        if (currentColor == Color.Black) continue;
                         // T
                         if (
                             (x >= 3 && y >= 1 && y <= 6) &&
                             (m_ColorMatrix[x - 3, y] == currentColor && m_ColorMatrix[x - 2, y] == currentColor && m_ColorMatrix[x - 1, y - 1] == currentColor && m_ColorMatrix[x - 1, y + 1] == currentColor)
                             )
                         {
-                            MoveGem(x, y, ValidGemMoves.Left);
-                            moves6++;
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Left);
+                                moves6++;
+                            }
                         }
                         else if (
                             (x <= 4 && y >= 1 && y <= 6) &&
                             (m_ColorMatrix[x + 3, y] == currentColor && m_ColorMatrix[x + 2, y] == currentColor && m_ColorMatrix[x + 1, y - 1] == currentColor && m_ColorMatrix[x + 1, y + 1] == currentColor)
                             )
                         {
-                            MoveGem(x, y, ValidGemMoves.Right);
-                            moves6++;
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Right);
+                                moves6++;
+                            }
                         }
                         else if (
                             (x >= 1 && x <= 6 && y >= 3) &&
                             (m_ColorMatrix[x, y - 3] == currentColor && m_ColorMatrix[x, y - 2] == currentColor && m_ColorMatrix[x + 1, y - 1] == currentColor && m_ColorMatrix[x - 1, y - 1] == currentColor)
                             )
                         {
-                            MoveGem(x, y, ValidGemMoves.Up);
-                            moves6++;
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Up);
+                                moves6++;
+                            }
                         }
                         else if (
                             (x >= 1 && x <= 6 && y <= 4) &&
                             (m_ColorMatrix[x, y + 3] == currentColor && m_ColorMatrix[x, y + 2] == currentColor && m_ColorMatrix[x - 1, y + 1] == currentColor && m_ColorMatrix[x + 1, y + 1] == currentColor)
                             )
                         {
-                            MoveGem(x, y, ValidGemMoves.Down);
-                            moves6++;
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Down);
+                                moves6++;
+                            }
                         }
-                        // L
                     }
                 }
             }
+
+            //for (int x = 0; x < 8; x++)
+            //{
+            //    for (int y = 0; y < 8; y++)
+            //    {
+            //        if (BejeweledColor.Collection.Contains(m_ColorMatrix[x, y]))
+            //        {
+            //            Color currentColor = m_ColorMatrix[x, y];
+            //            if (currentColor == Color.Black) continue;
+
+            //            // ┘ ┐
+            //            if (
+            //                (((x >= 3) && (y >= 2)) && (m_ColorMatrix[x - 3, y] == currentColor && m_ColorMatrix[x - 2, y] == currentColor && m_ColorMatrix[x - 1, y - 1] == currentColor && m_ColorMatrix[x - 1, y - 2] == currentColor))
+            //                ||
+            //                (((x >= 3) && (y <= 5)) && (m_ColorMatrix[x - 3, y] == currentColor && m_ColorMatrix[x - 2, y] == currentColor && m_ColorMatrix[x - 1, y + 1] == currentColor && m_ColorMatrix[x - 1, y + 2] == currentColor))
+            //                )
+            //            {
+            //                if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+            //                {
+            //                    MoveGem(x, y, ValidGemMoves.Left);
+            //                    moves6++;
+            //                }
+            //            }
+            //            // ┌ └
+            //            else if (
+            //                (((x <= 4) && (y <= 5)) && ((m_ColorMatrix[x + 3, y] == currentColor && m_ColorMatrix[x + 2, y] == currentColor && m_ColorMatrix[x + 1, y + 1] == currentColor && m_ColorMatrix[x + 1, y + 2] == currentColor)))
+            //                ||
+            //                (((x <= 4) && (y >= 2)) && ((m_ColorMatrix[x + 3, y] == currentColor && m_ColorMatrix[x + 2, y] == currentColor && m_ColorMatrix[x + 1, y - 1] == currentColor && m_ColorMatrix[x + 1, y - 2] == currentColor)))
+            //                )
+            //            {
+            //                    if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+            //                    {
+            //                        MoveGem(x, y, ValidGemMoves.Right);
+            //                        moves6++;
+            //                    }
+            //            }
+            //            // └ ┘
+            //            else if (
+            //                (((x <= 5) && (y >= 3)) && ((m_ColorMatrix[x, y - 3] == currentColor && m_ColorMatrix[x, y - 2] == currentColor && m_ColorMatrix[x + 1, y - 1] == currentColor && m_ColorMatrix[x + 2, y - 1] == currentColor)))
+            //                ||
+            //                (((x >= 2) && (y >= 3)) && ((m_ColorMatrix[x, y - 3] == currentColor && m_ColorMatrix[x, y - 2] == currentColor && m_ColorMatrix[x - 1, y - 1] == currentColor && m_ColorMatrix[x - 2, y - 1] == currentColor)))
+            //                )
+            //            {
+            //                        if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+            //                        {
+            //                            MoveGem(x, y, ValidGemMoves.Up);
+            //                            moves6++;
+            //                        }
+            //            }
+            //            // ┌ ┐
+            //            else if (
+            //                (((x <= 5) && (y <= 4)) && ((m_ColorMatrix[x, y + 3] == currentColor && m_ColorMatrix[x, y + 2] == currentColor && m_ColorMatrix[x + 1, y + 1] == currentColor && m_ColorMatrix[x + 2, y + 1] == currentColor)))
+            //                ||
+            //                (((x >= 2) && (y <= 4)) && ((m_ColorMatrix[x, y + 3] == currentColor && m_ColorMatrix[x, y + 2] == currentColor && m_ColorMatrix[x - 1, y + 1] == currentColor && m_ColorMatrix[x - 2, y + 1] == currentColor)))
+            //                )
+            //            {
+            //                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+            //                            {
+            //                                MoveGem(x, y, ValidGemMoves.Down);
+            //                                moves6++;
+            //                            }
+            //            }
+            //        }
+            //    }
+            //}
 
             for (int x = 0; x < 8; x++)
             {
@@ -143,6 +214,7 @@ namespace DotNetBejewelledBot
                     if (BejeweledColor.Collection.Contains(m_ColorMatrix[x, y]))
                     {
                         Color currentColor = m_ColorMatrix[x, y];
+                        if (currentColor == Color.Black) continue;
                         // L
 
                         if (
@@ -167,6 +239,28 @@ namespace DotNetBejewelledBot
                                 moves5++;
                             }
                         }
+                        else if (
+                                // 5 column
+                                ((x >=1) && (y >= 2 && y <= 5) && (m_ColorMatrix[x - 1, y + 2] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 2] == currentColor))
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Left);
+                                moves5++;
+                            }
+                        }
+                        else if (
+                                // 5 column
+                                ((x <= 6) && (y >= 2 && y <= 5) && (m_ColorMatrix[x + 1, y - 2] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 2] == currentColor))
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                MoveGem(x, y, ValidGemMoves.Right);
+                                moves5++;
+                            }
+                        }
                     }
                 }
             }
@@ -178,8 +272,7 @@ namespace DotNetBejewelledBot
                     if (BejeweledColor.Collection.Contains(m_ColorMatrix[x, y]))
                     {
                         Color currentColor = m_ColorMatrix[x, y];
-                        // L
-
+                        if (currentColor == Color.Black) continue;
                         if (
                                 // 4 row
                                 ((y >= 1) && (x >= 2 && x <= 6) && (m_ColorMatrix[x - 2, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) ||
@@ -206,13 +299,14 @@ namespace DotNetBejewelledBot
                 }
             }
 
-            for (int x = 0; x < 8; x++)
+            for (int x = 7; x >= 0; x--)
             {
-                for (int y = 0; y < 8; y++)
+                for (int y = 7; y >= 0; y--)
                 {
                     if (BejeweledColor.Collection.Contains(m_ColorMatrix[x, y]))
                     {
                         Color currentColor = m_ColorMatrix[x, y];
+                        if (currentColor == Color.Black) continue;
                         if (
                             // x - x x
                             ((x <= 4) && (currentColor == m_ColorMatrix[x + 2, y]) &&
@@ -307,20 +401,24 @@ namespace DotNetBejewelledBot
                 {
                     for (int y = 0; y < m_lockBejeweledImage.Height; y += 40)
                     {
-                        var test = m_lockBejeweledImage.GetSubset(x + 20, y + 10, 20, 1);
-                        int Rs = (int)test.Where((n, index) => index % 4 == 2).Average(num => (int)num);
-                        int Gs = (int)test.Where((n, index) => index % 4 == 1).Average(num => (int)num);
-                        int Bs = (int)test.Where((n, index) => index % 4 == 0).Average(num => (int)num);
+                        var test = m_lockBejeweledImage.GetSubset(x, y, 40, 40);
+                        // [BGRA]
+                        int Rs = (int)test.Where((n, index) => index % 4 == 2).Where((n, index) => clippingMask[index % 40, index / 40] == 1).Average(num => (int)num);
+                        int Gs = (int)test.Where((n, index) => index % 4 == 1).Where((n, index) => clippingMask[index % 40, index / 40] == 1).Average(num => (int)num);
+                        int Bs = (int)test.Where((n, index) => index % 4 == 0).Where((n, index) => clippingMask[index % 40, index / 40] == 1).Average(num => (int)num);
 
                         #region oldstuff
 
                         #endregion
+                        //Color nearest = GetNearest(BejeweledColor.Collection, Color.FromArgb(Rs, Gs, Bs));
+                        //m_ColorMatrix[x / 40, y / 40] = nearest;
+                        //gfxColourgrid.FillRectangle(new SolidBrush(nearest), new Rectangle(x, y, 40, 40));
 
                         // high red
                         if (Rs >= 180)
                         {
                             // high green
-                            if (Gs > 180)
+                            if (Gs > 181)
                             {
                                 if (Bs > 200)
                                 {
@@ -333,7 +431,7 @@ namespace DotNetBejewelledBot
                                     gfxColourgrid.FillRectangle(new SolidBrush(Color.Yellow), new Rectangle(x, y, 40, 40));
                                 }
                             }
-                            else if (Gs < 100)
+                            else if (Gs < 115)
                             // low green
                             {
                                 // high blue
@@ -393,9 +491,6 @@ namespace DotNetBejewelledBot
                                 }
                             }
                         }
-                        //m_ColorMatrix[x / 40, y / 40] = Color.FromArgb(R, G, B);
-                        //gfxColourgrid.FillRectangle(new SolidBrush(Color.FromArgb(R,G,B)), new Rectangle(x, y, 40, 40));
-                        //}
                     }
                 }
                 m_lockBejeweledImage.UnlockBits();
@@ -484,6 +579,67 @@ namespace DotNetBejewelledBot
                 return false;
             }
         }
+
+        private static Color GetNearest(List<Color> bejeweledColors, Color gemColor)
+        {
+            var colors = bejeweledColors.Select(x => new { Value = x, Diff = GetDiff(x, gemColor) }).ToList();
+            var min = colors.Min(x => x.Diff);
+            return colors.Find(x => x.Diff == min).Value;
+        }
+
+        private static int GetDiff(Color color, Color gemColor)
+        {
+            int a = color.A - gemColor.A,
+                r = color.R - gemColor.R,
+                g = color.G - gemColor.G,
+                b = color.B - gemColor.B;
+            return a * a + r * r + g * g + b * b;
+        }
+        /// <summary>
+        /// 40x40 clipping mask for getting colors. Should be good enough for each 40x40 cell.
+        /// </summary>
+        byte[,] clippingMask = {
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+            {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, }
+        };
     }
 
     class WindowNotFoundException : Exception { }

@@ -36,6 +36,7 @@ namespace DotNetBejewelledBot
             BejeweledColor.Collection.Add(BejeweledColor.Red);
             BejeweledColor.Collection.Add(BejeweledColor.White);
             BejeweledColor.Collection.Add(BejeweledColor.Yellow);
+            BejeweledColor.Collection.Add(BejeweledColor.Black);
             RegisterHotKey(this.Handle, START_HOTKEY_ID, 0, (int)Keys.F2);
         }
 
