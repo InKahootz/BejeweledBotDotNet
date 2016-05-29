@@ -642,8 +642,8 @@ namespace DotNetBejewelledBot
                                 (currentTicks - lastTouched[x + 2, y] > touchDelay) &&
                                 (currentTicks - lastTouched[x + 3, y] > touchDelay))
                             {
-                                TouchColor(currentTicks, x, y, 3, 0);
                                 TouchColor(currentTicks, x, y, 2, 0);
+                                TouchColor(currentTicks, x, y, 3, 0);
                                 m_ColorMatrix[x, y] = m_ColorMatrix[x + 1, y];
                                 TouchColor(currentTicks, x, y, 1, 0);
                                 //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2 });
@@ -659,8 +659,8 @@ namespace DotNetBejewelledBot
                                 (currentTicks - lastTouched[x - 2, y] > touchDelay) &&
                                 (currentTicks - lastTouched[x - 3, y] > touchDelay))
                             {
-                                TouchColor(currentTicks, x, y, -3, 0);
                                 TouchColor(currentTicks, x, y, -2, 0);
+                                TouchColor(currentTicks, x, y, -3, 0);
                                 m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
                                 TouchColor(currentTicks, x, y, -1, 0);
                                 //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2 });
@@ -710,8 +710,8 @@ namespace DotNetBejewelledBot
                                 (currentTicks - lastTouched[x - 2, y + 1] > touchDelay) &&
                                 (currentTicks - lastTouched[x - 1, y + 1] > touchDelay))
                             {
-                                TouchColor(currentTicks, x, y, 2, 0);
-                                TouchColor(currentTicks, x, y, 3, 0);
+                                TouchColor(currentTicks, x, y, -2, 1);
+                                TouchColor(currentTicks, x, y, -1, 1);
                                 m_ColorMatrix[x, y] = m_ColorMatrix[x, y + 1];
                                 TouchColor(currentTicks, x, y, 0, 1);
                                 //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2 });
@@ -852,7 +852,7 @@ namespace DotNetBejewelledBot
                                 TouchColor(currentTicks, x, y, -1, -2);
                                 TouchColor(currentTicks, x, y, -1, -1);
                                 m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
-                                TouchColor(currentTicks, x, y, 0, 1);
+                                TouchColor(currentTicks, x, y, -1, 0);
                                 //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2 });
                                 MoveGem(x, y, ValidGemMoves.Left);
                                 moves1++;
