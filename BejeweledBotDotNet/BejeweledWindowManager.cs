@@ -11,7 +11,7 @@ namespace DotNetBejewelledBot
 {
     internal class BejeweledWindowManager
     {
-        private const int touchDelay = 1200 * 10000;  // Change first number, 10,000 is ticks per ms.
+        private const int touchDelay = 750 * 10000;  // Change first number, 10,000 is ticks per ms.
         private Rectangle m_Window;
         private Bitmap m_ScreenShot;
         private LockBitmap m_lockScreenShot;
