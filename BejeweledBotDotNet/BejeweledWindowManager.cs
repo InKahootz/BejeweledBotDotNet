@@ -1,16 +1,16 @@
 ﻿using System;
-using System.Linq;
-using System.Threading;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
-using System.Collections.Generic;
 
 namespace DotNetBejewelledBot
 {
-    class BejeweledWindowManager
+    internal class BejeweledWindowManager
     {
-        const int touchDelay = 800;
+        private const int touchDelay = 800;
         private Rectangle m_Window;
         private Bitmap m_ScreenShot;
         private LockBitmap m_lockScreenShot;
@@ -19,6 +19,8 @@ namespace DotNetBejewelledBot
         private Bitmap m_ColourGrid;
         private Color[,] m_ColorMatrix;
         private long[,] lastTouched = new long[8, 8];
+
+        private List<GemMove> GemMovesToDo = new List<GemMove>();
 
         private long moves3 = 0;
         private long moves4 = 0;
@@ -101,6 +103,13 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x - 3, y] = Color.Black;
+                                m_ColorMatrix[x - 2, y] = Color.Black;
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
+                                m_ColorMatrix[x - 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x - 1, ToY = y, Priority = 5});
                                 MoveGem(x, y, ValidGemMoves.Left);
                                 moves6++;
                             }
@@ -112,6 +121,16 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x + 3, y] = Color.Black;
+
+                                m_ColorMatrix[x + 2, y] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x + 1, y];
+                                m_ColorMatrix[x + 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x + 1, ToY = y, Priority = 5});
                                 MoveGem(x, y, ValidGemMoves.Right);
                                 moves6++;
                             }
@@ -123,6 +142,16 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x, y - 3] = Color.Black;
+
+                                m_ColorMatrix[x, y - 2] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y - 1];
+                                m_ColorMatrix[x, y - 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y - 1, Priority = 5});
                                 MoveGem(x, y, ValidGemMoves.Up);
                                 moves6++;
                             }
@@ -134,6 +163,16 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x, y + 3] = Color.Black;
+
+                                m_ColorMatrix[x, y + 2] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y + 1];
+                                m_ColorMatrix[x, y + 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 5});
                                 MoveGem(x, y, ValidGemMoves.Down);
                                 moves6++;
                             }
@@ -141,6 +180,8 @@ namespace DotNetBejewelledBot
                     }
                 }
             }
+
+            #region L Moves
 
             //for (int x = 0; x < 8; x++)
             //{
@@ -207,6 +248,8 @@ namespace DotNetBejewelledBot
             //    }
             //}
 
+            #endregion L Moves
+
             for (int x = 0; x < 8; x++)
             {
                 for (int y = 0; y < 8; y++)
@@ -215,8 +258,6 @@ namespace DotNetBejewelledBot
                     {
                         Color currentColor = m_ColorMatrix[x, y];
                         if (currentColor == Color.Black) continue;
-                        // L
-
                         if (
                                 // 5 row
                                 ((y >= 1) && (x >= 2 && x <= 5) && (m_ColorMatrix[x - 2, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x + 2, y - 1] == currentColor))
@@ -224,6 +265,16 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x - 2, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 2, y - 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y - 1];
+                                m_ColorMatrix[x, y - 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y-1, Priority =  4});
                                 MoveGem(x, y, ValidGemMoves.Up);
                                 moves5++;
                             }
@@ -235,17 +286,38 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x - 2, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 2, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y + 1];
+                                m_ColorMatrix[x, y + 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority =  4});
                                 MoveGem(x, y, ValidGemMoves.Down);
                                 moves5++;
                             }
                         }
                         else if (
                                 // 5 column
-                                ((x >=1) && (y >= 2 && y <= 5) && (m_ColorMatrix[x - 1, y + 2] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 2] == currentColor))
+                                ((x >= 1) && (y >= 2 && y <= 5) && (m_ColorMatrix[x - 1, y + 2] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 2] == currentColor))
                                 )
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x - 1, y + 2] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 2] = Color.Black;
+
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
+                                m_ColorMatrix[x - 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x - 1, ToY = y, Priority =  4});
                                 MoveGem(x, y, ValidGemMoves.Left);
                                 moves5++;
                             }
@@ -257,6 +329,16 @@ namespace DotNetBejewelledBot
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x + 1, y - 2] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 2] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x + 1, y];
+                                m_ColorMatrix[x + 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x + 1, ToY = y, Priority =  4});
                                 MoveGem(x, y, ValidGemMoves.Right);
                                 moves5++;
                             }
@@ -273,28 +355,168 @@ namespace DotNetBejewelledBot
                     {
                         Color currentColor = m_ColorMatrix[x, y];
                         if (currentColor == Color.Black) continue;
+
+                        #region 4 Row
+
                         if (
                                 // 4 row
-                                ((y >= 1) && (x >= 2 && x <= 6) && (m_ColorMatrix[x - 2, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) ||
-                                  (y >= 1) && (x >= 1 && x <= 5) && (m_ColorMatrix[x + 2, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor)))
+                                (y >= 1) && (x >= 2 && x <= 6) && (m_ColorMatrix[x - 2, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor)
+                            )
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x - 2, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y - 1];
+                                m_ColorMatrix[x, y - 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y - 1, Priority = 2});
                                 MoveGem(x, y, ValidGemMoves.Up);
                                 moves4++;
                             }
                         }
                         else if (
                                 // 4 row
-                                ((y <= 6) && (x >= 2 && x <= 6) && (m_ColorMatrix[x - 2, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor) ||
-                                  (y <= 6) && (x >= 1 && x <= 5) && (m_ColorMatrix[x + 2, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor)))
+                                (y >= 1) && (x >= 1 && x <= 5) && (m_ColorMatrix[x + 2, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor)
+                                )
                         {
                             if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
                             {
+                                m_ColorMatrix[x + 2, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y - 1];
+                                m_ColorMatrix[x, y - 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y - 1, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Up);
+                                moves4++;
+                            }
+                        }
+                        else if (
+                                  // 4 row
+
+                                  (y <= 6) && (x >= 1 && x <= 5) && (m_ColorMatrix[x + 2, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor))
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x + 2, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y + 1];
+                                m_ColorMatrix[x, y + 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2});
                                 MoveGem(x, y, ValidGemMoves.Down);
                                 moves4++;
                             }
                         }
+                        else if (
+                                // 4 row
+                                (y <= 6) && (x >= 2 && x <= 6) && (m_ColorMatrix[x - 2, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor)
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x - 2, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x, y + 1];
+                                m_ColorMatrix[x, y + 1] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x, ToY = y + 1, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Down);
+                                moves4++;
+                            }
+                        }
+
+                        #endregion 4 Row
+
+                        #region 4 Column
+
+                        else if (
+                                // 4 column
+                                (x <= 6) && (y >= 2 && y <= 6) && (m_ColorMatrix[x + 1, y - 2] == currentColor) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor)
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x + 1, y - 2] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x + 1, y];
+                                m_ColorMatrix[x + 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x + 1, ToY = y, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Right);
+                                moves4++;
+                            }
+                        }
+                        else if (
+                                // 4 column
+                                (x <= 6) && (y >= 1 && y <= 5) && (m_ColorMatrix[x + 1, y - 1] == currentColor) && (m_ColorMatrix[x + 1, y + 1] == currentColor) && (m_ColorMatrix[x + 1, y + 2] == currentColor)
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x + 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x + 1, y + 2] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x + 1, y];
+                                m_ColorMatrix[x + 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x + 1, ToY = y, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Right);
+                                moves4++;
+                            }
+                        }
+                        else if (
+                                // 4 column
+                                (x >= 1) && (y >= 2 && y <= 6) && (m_ColorMatrix[x - 1, y - 2] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor)
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x - 1, y - 2] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
+                                m_ColorMatrix[x - 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x - 1, ToY = y, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Left);
+                                moves4++;
+                            }
+                        }
+                        else if (
+                                // 4 column
+                                (x >= 1) && (y >= 1 && y <= 5) && (m_ColorMatrix[x - 1, y + 2] == currentColor) && (m_ColorMatrix[x - 1, y + 1] == currentColor) && (m_ColorMatrix[x - 1, y - 1] == currentColor)
+                                )
+                        {
+                            if (currentTicks - lastTouched[x, y] > (touchDelay * 10000))
+                            {
+                                m_ColorMatrix[x - 1, y + 2] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y + 1] = Color.Black;
+
+                                m_ColorMatrix[x - 1, y - 1] = Color.Black;
+                                m_ColorMatrix[x, y] = m_ColorMatrix[x - 1, y];
+                                m_ColorMatrix[x - 1, y] = Color.Black;
+                                //GemMovesToDo.Add(new GemMove() { FromX = x, FromY = y, ToX = x - 1, ToY = y, Priority = 2 });
+                                MoveGem(x, y, ValidGemMoves.Left);
+                                moves4++;
+                            }
+                        }
+
+                        #endregion 4 Column
                     }
                 }
             }
@@ -387,6 +609,7 @@ namespace DotNetBejewelledBot
                 }
             }
         }
+
         public void GetColourGrid()
         {
             m_ColourGrid = new Bitmap(m_Window.Width,
@@ -407,9 +630,6 @@ namespace DotNetBejewelledBot
                         int Gs = (int)test.Where((n, index) => index % 4 == 1).Where((n, index) => clippingMask[index % 40, index / 40] == 1).Average(num => (int)num);
                         int Bs = (int)test.Where((n, index) => index % 4 == 0).Where((n, index) => clippingMask[index % 40, index / 40] == 1).Average(num => (int)num);
 
-                        #region oldstuff
-
-                        #endregion
                         //Color nearest = GetNearest(BejeweledColor.Collection, Color.FromArgb(Rs, Gs, Bs));
                         //m_ColorMatrix[x / 40, y / 40] = nearest;
                         //gfxColourgrid.FillRectangle(new SolidBrush(nearest), new Rectangle(x, y, 40, 40));
@@ -501,7 +721,6 @@ namespace DotNetBejewelledBot
         {
             switch (Direction)
             {
-
                 case ValidGemMoves.Down:
                     {
                         // Move gem down
@@ -595,10 +814,11 @@ namespace DotNetBejewelledBot
                 b = color.B - gemColor.B;
             return a * a + r * r + g * g + b * b;
         }
+
         /// <summary>
         /// 40x40 clipping mask for getting colors. Should be good enough for each 40x40 cell.
         /// </summary>
-        byte[,] clippingMask = {
+        private byte[,] clippingMask = {
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
             {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
@@ -642,5 +862,6 @@ namespace DotNetBejewelledBot
         };
     }
 
-    class WindowNotFoundException : Exception { }
+    internal class WindowNotFoundException : Exception
+    { }
 }
