@@ -22,12 +22,12 @@ namespace DotNetBejewelledBot
         const int START_HOTKEY_ID = 1;
         private BejeweledWindowManager m_BWM;
         private int tick = 0;
-        private bool botRunning = false;
 
         public frmMain()
         {
             InitializeComponent();
             m_BWM = new BejeweledWindowManager();
+            m_BWM.BotRunning = false;
             BejeweledColor.Collection = new List<Color>();
             BejeweledColor.Collection.Add(BejeweledColor.Blue);
             BejeweledColor.Collection.Add(BejeweledColor.Green);
@@ -36,6 +36,7 @@ namespace DotNetBejewelledBot
             BejeweledColor.Collection.Add(BejeweledColor.Red);
             BejeweledColor.Collection.Add(BejeweledColor.White);
             BejeweledColor.Collection.Add(BejeweledColor.Yellow);
+            BejeweledColor.Collection.Add(BejeweledColor.YellowCoin);
             BejeweledColor.Collection.Add(BejeweledColor.Black);
             RegisterHotKey(this.Handle, START_HOTKEY_ID, 0, (int)Keys.F2);
         }
@@ -67,23 +68,23 @@ namespace DotNetBejewelledBot
         {
             screenGrabTimer.Start();
             btnStart.Enabled = false;
-            botRunning = true;
+            m_BWM.BotRunning = true;
         }
 
         protected override void WndProc(ref Message m)
         {
             if (m.Msg == 0x0312 && m.WParam.ToInt32() == START_HOTKEY_ID)
             {
-                if (botRunning)
+                if (m_BWM.BotRunning)
                 {
-                    botRunning = false;
+                    m_BWM.BotRunning = false;
                     screenGrabTimer.Stop();
                     tick = 0;
                     btnStart.Enabled = true;
                 }
                 else
                 {
-                    botRunning = true;
+                    m_BWM.BotRunning = true;
                     screenGrabTimer.Start();
                     btnStart.Enabled = false;
                 }
@@ -97,10 +98,10 @@ namespace DotNetBejewelledBot
             pictureBox1.Image = m_BWM.ColourGrid;
         }
 
-        private void ScreenShot_Click(object sender, EventArgs e)
+        private void ShowMoves_Click(object sender, EventArgs e)
         {
-            m_BWM.GetScreenshot();
-            pictureBox1.Image = m_BWM.ScreenShot;
+            m_BWM.CalculateMoves();
+            pictureBox1.Image = m_BWM.ColourGrid;
         }
     }
 }

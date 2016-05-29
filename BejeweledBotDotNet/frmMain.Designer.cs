@@ -34,7 +34,7 @@
             this.btnCalibrate = new System.Windows.Forms.Button();
             this.btnStart = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.ScreenShot = new System.Windows.Forms.Button();
+            this.ShowMoves = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -87,23 +87,23 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.ColorGridize_Click);
             // 
-            // ScreenShot
+            // ShowMoves
             // 
-            this.ScreenShot.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ScreenShot.Location = new System.Drawing.Point(258, 309);
-            this.ScreenShot.Name = "ScreenShot";
-            this.ScreenShot.Size = new System.Drawing.Size(75, 23);
-            this.ScreenShot.TabIndex = 4;
-            this.ScreenShot.Text = "ScreenShot";
-            this.ScreenShot.UseVisualStyleBackColor = true;
-            this.ScreenShot.Click += new System.EventHandler(this.ScreenShot_Click);
+            this.ShowMoves.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ShowMoves.Location = new System.Drawing.Point(258, 309);
+            this.ShowMoves.Name = "ShowMoves";
+            this.ShowMoves.Size = new System.Drawing.Size(75, 23);
+            this.ShowMoves.TabIndex = 4;
+            this.ShowMoves.Text = "ShowMoves";
+            this.ShowMoves.UseVisualStyleBackColor = true;
+            this.ShowMoves.Click += new System.EventHandler(this.ShowMoves_Click);
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(397, 345);
-            this.Controls.Add(this.ScreenShot);
+            this.Controls.Add(this.ShowMoves);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.btnStart);
             this.Controls.Add(this.btnCalibrate);
@@ -123,7 +123,7 @@
         private System.Windows.Forms.Button btnCalibrate;
         private System.Windows.Forms.Button btnStart;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button ScreenShot;
+        private System.Windows.Forms.Button ShowMoves;
     }
 }
 
