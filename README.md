@@ -5,6 +5,6 @@ A screen viewing application that calibrates itself for the bejeweled window and
 
 ![Screenshot](http://i.imgur.com/Lmmod31.png)
 
-Top Score: 2,333,000 (with Cat rare gem, starting multiplier gem, 1:15 total play time)
+Top Score: 2,425,300 (with Cat rare gem, starting multiplier gem, 1:15 total play time)
 
 ![Screenshot](http://i.imgur.com/0hOOfY3.png)
